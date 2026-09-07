@@ -1,0 +1,54 @@
+{
+  "_comment": "criterion order follows the standard AUN-QA v3 programme-level structure (PS = Programme Specification, P1-P4 & P8 = Criteria 1-4 and 8). guideline is per-criterion, written directly here (changefeature.md) instead of extracted from an uploaded Guideline file - PS/P1 have real content; P2/P3/P4/P8 are left empty ([]) until real guideline text is available (never fabricate AUN-QA guideline text without a source).",
+  "current_academic_year": 2568,
+  "criterion_order": ["PS", "P1", "P2", "P3", "P4", "P8"],
+  "criteria": {
+    "PS": {
+      "name": "Programme Specification (การบริหารหลักสูตรตามเกณฑ์มาตรฐานหลักสูตรฯ)",
+      "guideline": [],
+      "evidence_top_k": 100,
+      "keywords": [
+        "อาจารย์ผู้รับผิดชอบหลักสูตร",
+        "อาจารย์ประจำหลักสูตร",
+        "คุณวุฒิ",
+        "สังกัดหลักสูตร",
+        "คำสั่งแต่งตั้ง"
+      ],
+      "required_evidence": []
+    },
+    "P1": {
+      "name": "Expected Learning Outcomes (ผลลัพธ์การเรียนรู้ที่คาดหวัง)",
+      "guideline": [
+        "ต้องมีการกำหนด ELOs/PLOs ที่ชัดเจน ครอบคลุมทั้ง Generic Skills และ Specific Skills",
+        "PLOs ต้องสอดคล้องกับความต้องการของผู้มีส่วนได้ส่วนเสีย (Stakeholders)",
+        "ต้องมีการกระจายความรับผิดชอบผลลัพธ์การเรียนรู้สู่รายวิชา (Curriculum Mapping)"
+      ],
+      "keywords": ["Expected Learning Outcomes", "PLO", "Curriculum Mapping", "Stakeholders"],
+      "required_evidence": ["มคอ.2 หมวดวัตถุประสงค์และผลลัพธ์การเรียนรู้", "ตาราง Curriculum Mapping"]
+    },
+    "P2": {
+      "name": "Programme Structure and Content",
+      "guideline": [],
+      "keywords": ["programme structure", "curriculum content", "โครงสร้างหลักสูตร", "รายวิชา"],
+      "required_evidence": ["Curriculum structure", "course syllabi", "credit distribution"]
+    },
+    "P3": {
+      "name": "Teaching and Learning Approach",
+      "guideline": [],
+      "keywords": ["teaching and learning", "การจัดการเรียนการสอน", "instructional design"],
+      "required_evidence": ["Teaching methods documentation", "lesson plans", "active learning evidence"]
+    },
+    "P4": {
+      "name": "Student Assessment",
+      "guideline": [],
+      "keywords": ["student assessment", "การวัดและประเมินผล", "assessment methods"],
+      "required_evidence": ["Assessment rubrics", "exam samples", "grading records"]
+    },
+    "P8": {
+      "name": "Output and Outcomes",
+      "guideline": [],
+      "keywords": ["output and outcomes", "graduate employment", "อัตราการสำเร็จการศึกษา", "graduation rate"],
+      "required_evidence": ["Graduation rate", "employment rate", "graduate/employer satisfaction surveys"]
+    }
+  }
+}
