@@ -1,0 +1,19 @@
+.document-workspace {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.document-workspace__content {
+  min-height: 400px;
+}
+
+.document-workspace__error {
+  color: var(--color-error);
+  margin: 0;
+}
+
+.document-workspace__notice {
+  color: var(--color-success);
+  margin: 0;
+}

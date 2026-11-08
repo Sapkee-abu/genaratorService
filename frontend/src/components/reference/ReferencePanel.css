@@ -1,0 +1,20 @@
+.reference-panel {
+  display: grid;
+  grid-template-columns: 30% 70%;
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.reference-panel__tree {
+  min-height: 400px;
+}
+
+.reference-panel__details {
+  min-height: 400px;
+}
+
+@media (max-width: 900px) {
+  .reference-panel {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,14 @@
+.reference-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.reference-page__title {
+  font-size: 20px;
+  margin: 0;
+}
+
+.reference-page__error {
+  color: var(--color-error);
+}

@@ -1,0 +1,37 @@
+.reference-tree-node {
+  padding: var(--space-2) var(--space-3);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.reference-tree-node:hover {
+  background: var(--color-background);
+}
+
+.reference-tree-node--selected {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.reference-tree-node__toggle {
+  font-size: 10px;
+  width: 10px;
+}
+
+.reference-tree-node__children {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.reference-tree-node__count {
+  margin-left: auto;
+  font-size: 12px;
+}
+
+.reference-tree-node--selected .reference-tree-node__count {
+  color: inherit;
+}

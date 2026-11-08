@@ -1,0 +1,30 @@
+.source-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.source-badge__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.source-badge--chroma .source-badge__dot {
+  background: #2a6f97;
+}
+
+.source-badge--mongodb .source-badge__dot {
+  background: var(--color-success);
+}
+
+.source-badge--document_ocr .source-badge__dot {
+  background: var(--color-warning);
+}
+
+.source-badge--user_edit .source-badge__dot {
+  background: #7a4fc9;
+}

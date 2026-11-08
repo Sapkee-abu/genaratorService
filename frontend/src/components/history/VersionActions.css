@@ -1,0 +1,10 @@
+.version-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.version-actions .btn {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}

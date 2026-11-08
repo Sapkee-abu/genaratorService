@@ -1,0 +1,27 @@
+.history-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.history-page__title {
+  font-size: 20px;
+  margin: 0;
+}
+
+.history-page__error {
+  color: var(--color-error);
+}
+
+.history-page__preview {
+  margin-top: var(--space-4);
+}
+
+.history-page__preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  font-weight: 600;
+}

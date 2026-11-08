@@ -1,0 +1,38 @@
+.document-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: var(--space-4) var(--space-5);
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.document-toolbar__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.document-toolbar__filename {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.document-toolbar__meta {
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+.document-toolbar__draft-state {
+  font-size: 13px;
+  color: var(--color-success);
+}
+
+.document-toolbar__draft-state--unsaved {
+  color: var(--color-warning);
+}
+
+.document-toolbar__actions {
+  display: flex;
+  gap: var(--space-2);
+}

@@ -1,0 +1,26 @@
+:root {
+  --color-primary: #1f4e79;
+  --color-primary-hover: #163a5c;
+  --color-background: #f5f6f8;
+  --color-surface: #ffffff;
+  --color-border: #d9dee3;
+  --color-text: #1f2328;
+  --color-muted: #5c6570;
+  --color-success: #1e7a3d;
+  --color-warning: #92650a;
+  --color-error: #b3261e;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+
+  --shadow-sm: 0 1px 2px rgba(20, 24, 28, 0.06);
+
+  --font-family: "Segoe UI", "Noto Sans Thai", system-ui, sans-serif;
+}

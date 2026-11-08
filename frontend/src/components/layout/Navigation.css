@@ -1,0 +1,25 @@
+.app-nav {
+  display: flex;
+  gap: var(--space-5);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: 0 var(--space-6);
+}
+
+.app-nav__link {
+  display: inline-block;
+  padding: var(--space-3) 0;
+  color: var(--color-muted);
+  text-decoration: none;
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+}
+
+.app-nav__link:hover {
+  color: var(--color-text);
+}
+
+.app-nav__link--active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}

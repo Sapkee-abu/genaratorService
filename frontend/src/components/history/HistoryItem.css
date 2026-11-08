@@ -1,0 +1,23 @@
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-4) var(--space-5);
+  margin-bottom: var(--space-3);
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.history-item__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.history-item__version {
+  font-weight: 600;
+}
+
+.history-item__timestamp {
+  font-size: 13px;
+}

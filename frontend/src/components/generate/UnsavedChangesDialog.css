@@ -1,0 +1,21 @@
+.unsaved-dialog__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 24, 28, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.unsaved-dialog {
+  padding: var(--space-5);
+  max-width: 360px;
+}
+
+.unsaved-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}

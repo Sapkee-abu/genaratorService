@@ -1,0 +1,55 @@
+.reference-details {
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.reference-details__empty {
+  padding: var(--space-5);
+}
+
+.reference-details__row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.reference-details__label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+}
+
+.reference-details__value {
+  font-size: 15px;
+  word-break: break-word;
+}
+
+.reference-details__records {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1, 4px);
+}
+
+.reference-details__documents {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2, 8px);
+}
+
+.reference-details__document-link {
+  color: var(--color-primary, #176b4d);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.reference-details__document-link:hover {
+  text-decoration-thickness: 2px;
+}

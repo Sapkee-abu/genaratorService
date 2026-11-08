@@ -1,0 +1,5 @@
+.document-editor {
+  outline: 2px dashed var(--color-primary);
+  outline-offset: -2px;
+  min-height: 200px;
+}

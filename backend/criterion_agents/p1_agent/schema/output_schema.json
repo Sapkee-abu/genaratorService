@@ -1,0 +1,215 @@
+{
+  "$defs": {
+    "CitationEntry": {
+      "description": "Top-level citation (mainpromt.md sec.27/33): links a narrative's [N]\nmarker, or a table row, back to the exact evidence span used.",
+      "properties": {
+        "citation_id": {
+          "title": "Citation Id",
+          "type": "string"
+        },
+        "text_span": {
+          "title": "Text Span",
+          "type": "string"
+        },
+        "source_filename": {
+          "title": "Source Filename",
+          "type": "string"
+        },
+        "chunk_index": {
+          "title": "Chunk Index",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "citation_id",
+        "text_span",
+        "source_filename",
+        "chunk_index"
+      ],
+      "title": "CitationEntry",
+      "type": "object"
+    },
+    "GapAnalysis": {
+      "properties": {
+        "status": {
+          "enum": [
+            "complete",
+            "missing",
+            "not_applicable"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "missing_fields": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Missing Fields",
+          "type": "array"
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "title": "GapAnalysis",
+      "type": "object"
+    },
+    "NarrativeSection": {
+      "properties": {
+        "type": {
+          "const": "narrative",
+          "title": "Type",
+          "type": "string"
+        },
+        "slot_id": {
+          "title": "Slot Id",
+          "type": "string"
+        },
+        "content": {
+          "title": "Content",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "slot_id",
+        "content"
+      ],
+      "title": "NarrativeSection",
+      "type": "object"
+    },
+    "RowCitation": {
+      "description": "Table-row citation (mainpromt.md sec.29): row-level only, no\ncitation_id/text_span - just which evidence chunk backs this row.",
+      "properties": {
+        "source_filename": {
+          "title": "Source Filename",
+          "type": "string"
+        },
+        "chunk_index": {
+          "title": "Chunk Index",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "source_filename",
+        "chunk_index"
+      ],
+      "title": "RowCitation",
+      "type": "object"
+    },
+    "TableRow": {
+      "properties": {
+        "values": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Values",
+          "type": "array"
+        },
+        "citations": {
+          "items": {
+            "$ref": "#/$defs/RowCitation"
+          },
+          "title": "Citations",
+          "type": "array"
+        },
+        "group": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Group"
+        },
+        "record_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Record Key"
+        }
+      },
+      "required": [
+        "values"
+      ],
+      "title": "TableRow",
+      "type": "object"
+    },
+    "TableSection": {
+      "properties": {
+        "type": {
+          "const": "table",
+          "title": "Type",
+          "type": "string"
+        },
+        "slot_id": {
+          "title": "Slot Id",
+          "type": "string"
+        },
+        "headers": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Headers",
+          "type": "array"
+        },
+        "rows": {
+          "items": {
+            "$ref": "#/$defs/TableRow"
+          },
+          "title": "Rows",
+          "type": "array"
+        }
+      },
+      "required": [
+        "type",
+        "slot_id",
+        "headers",
+        "rows"
+      ],
+      "title": "TableSection",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "gap_analysis": {
+      "$ref": "#/$defs/GapAnalysis"
+    },
+    "sections": {
+      "items": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/NarrativeSection"
+          },
+          {
+            "$ref": "#/$defs/TableSection"
+          }
+        ]
+      },
+      "title": "Sections",
+      "type": "array"
+    },
+    "citations": {
+      "items": {
+        "$ref": "#/$defs/CitationEntry"
+      },
+      "title": "Citations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "gap_analysis",
+    "sections"
+  ],
+  "title": "AgentResponse",
+  "type": "object"
+}
