@@ -38,7 +38,7 @@ from common.verification import verify
 from criterion_agents._shared import AgentOutputError
 from criterion_agents.ps_agent.person_aggregation import aggregate_curriculum_people
 from criterion_agents.registry import get_agent
-from master_agent import context as context_module
+from common.master_config import validate_master_config
 from master_agent.docx_utils import force_field_update
 from master_agent.slot_marking_agent import SlotMarkingError, apply_marks, run_slot_marking_agent
 from master_agent.slot_map import build_slot_map
@@ -65,8 +65,7 @@ def mcp_server_parameters(generator_root: Path) -> StdioServerParameters:
 
 
 async def _call_tool_single(session: ClientSession, name: str, arguments: dict | None = None) -> dict:
-    """For tools that return one JSON object (get_sar_template, get_example,
-    get_master_config)."""
+    """Parse an MCP tool result containing one JSON object."""
     result = await session.call_tool(name, arguments or {})
     if result.isError:
         raise RuntimeError(f"MCP tool '{name}' failed: {result.content}")
@@ -119,27 +118,15 @@ async def run(run_id: str | None = None) -> Path:
             await session.initialize()
 
             # ---------- INITIALIZATION (mainpromt.md sec.4-9, changefeature.md sec.22) ----------
-            # Template/Example are opened straight from the bytes MCP handed
-            # back - no temp file ever touches disk before the final export,
-            # per addfeature.md's in-memory-only rule. Guideline is NOT
-            # fetched here anymore - per changefeature.md, each criterion's
-            # guideline lives directly in master_config.json.
+            # Open the template in memory and load the criterion configuration.
+            # Readiness rules belong to Monitor; no example is loaded.
             template_payload = await _call_tool_single(session, "get_sar_template")
             if not template_payload.get("found"):
                 raise RuntimeError(template_payload.get("error", "SAR Template not available"))
             template_bytes = base64.b64decode(template_payload["content_base64"])
             document = docx.Document(io.BytesIO(template_bytes))
 
-            example_payload = await _call_tool_single(session, "get_example")
-            example_text = ""
-            example_document = None
-            if example_payload.get("found"):
-                example_bytes = base64.b64decode(example_payload["content_base64"])
-                example_text = context_module.extract_text(example_bytes, example_payload["file_format"])
-                if example_payload["file_format"] == "docx":
-                    example_document = docx.Document(io.BytesIO(example_bytes))
-
-            master_config = await _call_tool_single(session, "get_master_config")
+            master_config = validate_master_config(await _call_tool_single(session, "get_master_config"))
             criterion_order: list[str] = master_config["criterion_order"]
             criteria_meta: dict = master_config["criteria"]
             current_academic_year: int | None = master_config.get("current_academic_year")
@@ -150,7 +137,6 @@ async def run(run_id: str | None = None) -> Path:
             # nobody has to hand-mark the real SAR template. Runs once,
             # before the loop.
             structure = describe_document(document)
-            example_structure = describe_document(example_document) if example_document is not None else None
             try:
                 # google-genai exposes a synchronous generate_content call in
                 # the current agent helpers. Keep that network wait away from
@@ -160,7 +146,6 @@ async def run(run_id: str | None = None) -> Path:
                     run_slot_marking_agent,
                     structure,
                     criteria_meta,
-                    example_structure,
                 )
                 resolved_slots = apply_marks(document, structure, marking_result.marked_slots)
                 print(f"Slot Marking Agent: resolved {len(resolved_slots)}/{len(marking_result.marked_slots)} slots")
@@ -312,7 +297,6 @@ async def run(run_id: str | None = None) -> Path:
                     await log_criterion(run_id, criterion_code, "skipped_no_slots", [])
                     continue
 
-                example_section = example_text
                 agent = get_agent(criterion_code)  # same Agent module used for every retry below
 
                 # Per-criterion override (master_config.json) takes priority over
@@ -336,7 +320,7 @@ async def run(run_id: str | None = None) -> Path:
 
                 # The Agent determines its own Data Requirement (change.md sec.7) -
                 # Master/Retrieval Manager never decide what a criterion needs.
-                data_request = agent.build_data_request(meta, target_slots)
+                data_request = agent.build_data_request(target_slots)
 
                 feedback: str | None = None
                 excluded_chunk_ids: list[str] = []
@@ -382,10 +366,6 @@ async def run(run_id: str | None = None) -> Path:
                         response = await asyncio.to_thread(
                             agent.run,
                             meta["name"],
-                            meta["guideline"],
-                            meta["keywords"],
-                            meta["required_evidence"],
-                            example_section,
                             evidence_context,
                             target_slots,
                             current_academic_year=current_academic_year,

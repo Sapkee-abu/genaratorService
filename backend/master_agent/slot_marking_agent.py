@@ -39,10 +39,10 @@ SYSTEM_PROMPT = """\
 {{slot_id}} หรือผูก Table Object ใน RAM ได้อย่างแม่นยำ สำหรับทุกเกณฑ์ที่ระบุใน [CRITERIA_CONFIG] \
 ก่อนเริ่ม Criteria Processing Loop
 
-[CRITERIA_CONFIG] แต่ละเกณฑ์มี guideline (กฎ/ข้อกำหนดของเกณฑ์นั้น), keywords, และ required_evidence - \
-ใช้ข้อมูลเหล่านี้เพื่อทำความเข้าใจว่าเกณฑ์นั้นต้องการข้อมูลประเภทใด แต่ **Document Structure จาก \
-Template จริงเท่านั้นที่เป็น Source of Truth สำหรับตำแหน่ง p_index/table_index** - guideline ไม่มีสิทธิ์ \
-กำหนดตำแหน่งเอง ถ้าไม่พบตำแหน่งที่เหมาะสมในเอกสารจริง ให้ไม่ต้องสร้าง slot สำหรับเกณฑ์นั้น
+[CRITERIA_CONFIG] แต่ละเกณฑ์มี criterion (รหัสเกณฑ์) และ name - \
+ใช้เพื่อจับคู่เกณฑ์กับหัวข้อในเอกสาร แต่ **Document Structure จาก \
+Template จริงเท่านั้นที่เป็น Source of Truth สำหรับตำแหน่ง p_index/table_index** - \
+ถ้าไม่พบตำแหน่งที่เหมาะสมในเอกสารจริง ให้ไม่ต้องสร้าง slot สำหรับเกณฑ์นั้น
 
 อินพุตที่ได้รับ (ดูใน [DOCUMENT_STRUCTURE]):
 - paragraphs: [{"p_index": 0, "text": "...", "is_heading": true/false, "is_empty": true/false}, ...]
@@ -89,33 +89,18 @@ Template จริงเท่านั้นที่เป็น Source of Tru
 """
 
 
-def build_prompt(structure: dict, criteria_meta: dict, example_structure: dict | None) -> str:
+def build_prompt(structure: dict, criteria_meta: dict) -> str:
     criteria_config = [
-        {
-            "criterion": code,
-            "name": meta["name"],
-            "guideline": meta["guideline"],
-            "keywords": meta["keywords"],
-            "required_evidence": meta["required_evidence"],
-        }
+        {"criterion": code, "name": meta["name"]}
         for code, meta in criteria_meta.items()
     ]
 
-    prompt = f"""[CRITERIA_CONFIG]
+    return f"""[CRITERIA_CONFIG]
 {json.dumps(criteria_config, ensure_ascii=False, indent=2)}
 
 [DOCUMENT_STRUCTURE]
 {json.dumps(structure, ensure_ascii=False, indent=2)}
 """
-
-    if example_structure:
-        prompt += f"""
-[EXAMPLE_STRUCTURE]
-(โครงสร้างรายงานปีก่อนหน้า ใช้ดูตำแหน่งของเนื้อหาบรรยายและตารางข้อมูลจริงเท่านั้น ห้ามใช้เป็นข้อเท็จจริง)
-{json.dumps(example_structure, ensure_ascii=False, indent=2)}
-"""
-
-    return prompt
 
 
 class SlotMarkingError(Exception):
@@ -125,9 +110,8 @@ class SlotMarkingError(Exception):
 def run_slot_marking_agent(
     structure: dict,
     criteria_meta: dict,
-    example_structure: dict | None = None,
 ) -> SlotMarkingResult:
-    prompt = build_prompt(structure, criteria_meta, example_structure)
+    prompt = build_prompt(structure, criteria_meta)
     raw = generate_json(f"{SYSTEM_PROMPT}\n\n{prompt}")
 
     try:

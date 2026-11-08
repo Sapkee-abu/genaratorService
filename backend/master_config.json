@@ -1,54 +1,31 @@
 {
-  "_comment": "criterion order follows the standard AUN-QA v3 programme-level structure (PS = Programme Specification, P1-P4 & P8 = Criteria 1-4 and 8). guideline is per-criterion, written directly here (changefeature.md) instead of extracted from an uploaded Guideline file - PS/P1 have real content; P2/P3/P4/P8 are left empty ([]) until real guideline text is available (never fabricate AUN-QA guideline text without a source).",
+  "_comment": "Generator Service config: per-criterion specification (name + evidence_top_k - each criterion's content differs, so each needs a different amount of evidence) and the order criteria are generated in. No keywords (SRS FR-010: each Criterion Agent derives its own Data Request from its Target Slots) and no guideline / required_evidence (criterion rules and data completeness belong to Monitor's ps_requirements). Served to Master through the MCP get_master_config tool and validated by common/master_config.py.",
   "current_academic_year": 2568,
   "criterion_order": ["PS", "P1", "P2", "P3", "P4", "P8"],
   "criteria": {
     "PS": {
       "name": "Programme Specification (การบริหารหลักสูตรตามเกณฑ์มาตรฐานหลักสูตรฯ)",
-      "guideline": [],
-      "evidence_top_k": 100,
-      "keywords": [
-        "อาจารย์ผู้รับผิดชอบหลักสูตร",
-        "อาจารย์ประจำหลักสูตร",
-        "คุณวุฒิ",
-        "สังกัดหลักสูตร",
-        "คำสั่งแต่งตั้ง"
-      ],
-      "required_evidence": []
+      "evidence_top_k": 100
     },
     "P1": {
       "name": "Expected Learning Outcomes (ผลลัพธ์การเรียนรู้ที่คาดหวัง)",
-      "guideline": [
-        "ต้องมีการกำหนด ELOs/PLOs ที่ชัดเจน ครอบคลุมทั้ง Generic Skills และ Specific Skills",
-        "PLOs ต้องสอดคล้องกับความต้องการของผู้มีส่วนได้ส่วนเสีย (Stakeholders)",
-        "ต้องมีการกระจายความรับผิดชอบผลลัพธ์การเรียนรู้สู่รายวิชา (Curriculum Mapping)"
-      ],
-      "keywords": ["Expected Learning Outcomes", "PLO", "Curriculum Mapping", "Stakeholders"],
-      "required_evidence": ["มคอ.2 หมวดวัตถุประสงค์และผลลัพธ์การเรียนรู้", "ตาราง Curriculum Mapping"]
+      "evidence_top_k": 6
     },
     "P2": {
       "name": "Programme Structure and Content",
-      "guideline": [],
-      "keywords": ["programme structure", "curriculum content", "โครงสร้างหลักสูตร", "รายวิชา"],
-      "required_evidence": ["Curriculum structure", "course syllabi", "credit distribution"]
+      "evidence_top_k": 6
     },
     "P3": {
       "name": "Teaching and Learning Approach",
-      "guideline": [],
-      "keywords": ["teaching and learning", "การจัดการเรียนการสอน", "instructional design"],
-      "required_evidence": ["Teaching methods documentation", "lesson plans", "active learning evidence"]
+      "evidence_top_k": 6
     },
     "P4": {
       "name": "Student Assessment",
-      "guideline": [],
-      "keywords": ["student assessment", "การวัดและประเมินผล", "assessment methods"],
-      "required_evidence": ["Assessment rubrics", "exam samples", "grading records"]
+      "evidence_top_k": 6
     },
     "P8": {
       "name": "Output and Outcomes",
-      "guideline": [],
-      "keywords": ["output and outcomes", "graduate employment", "อัตราการสำเร็จการศึกษา", "graduation rate"],
-      "required_evidence": ["Graduation rate", "employment rate", "graduate/employer satisfaction surveys"]
+      "evidence_top_k": 6
     }
   }
 }

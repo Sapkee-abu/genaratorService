@@ -84,7 +84,7 @@ ROLE_CODE_TO_LABEL = {
 }
 
 
-def build_data_request(meta: dict, target_slots: list[TargetSlot]) -> DataRequest:
+def build_data_request(target_slots: list[TargetSlot]) -> DataRequest:
     return DataRequest(
         criterion=CRITERION_CODE,
         requests=[
@@ -298,10 +298,6 @@ def _build_deterministic_tables(table_slots: list[TargetSlot], structured_contex
 
 def run(
     criterion_name: str,
-    guideline: list[str],
-    keywords: list[str],
-    required_evidence: list[str],
-    example_section: str,
     evidence_chunks: list[EvidenceChunkContext],
     target_slots: list[TargetSlot],
     current_academic_year: int | None = None,
@@ -315,10 +311,6 @@ def run(
         return _shared.run_agent(
             CRITERION_CODE,
             criterion_name,
-            guideline,
-            keywords,
-            required_evidence,
-            example_section,
             evidence_chunks,
             target_slots,
             current_academic_year,
@@ -335,10 +327,6 @@ def run(
         narrative_response = _shared.run_agent(
             CRITERION_CODE,
             criterion_name,
-            guideline,
-            keywords,
-            required_evidence,
-            example_section,
             evidence_chunks,
             narrative_slots,
             current_academic_year,

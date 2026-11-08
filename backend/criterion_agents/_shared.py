@@ -22,7 +22,7 @@ from pydantic import ValidationError
 
 from common.config import get_settings
 from common.gemini import generate_json
-from common.schemas import AgentResponse, DataRequest, DataRequestItem, EvidenceChunkContext, TargetSlot
+from common.schemas import AgentResponse, DataRequest, EvidenceChunkContext, TargetSlot
 from master_agent.context import group_evidence_by_source
 
 EXAMPLE_JSON_STRUCTURE = {
@@ -72,22 +72,19 @@ def _base_system_prompt(
     prompt = (
         f"คุณคือ AUN-QA Criteria Agent ประจำเกณฑ์ {criterion_code} ({criterion_name})\n\n"
         "ทำงานตามลำดับนี้เท่านั้น:\n"
-        "1. อ่าน [GUIDELINE] ของเกณฑ์นี้ - คือกฎ/ข้อกำหนด/เงื่อนไขที่ต้องตรวจสอบ ไม่ใช่ข้อเท็จจริง\n"
+        "1. อ่าน [TARGET_SLOTS] ของเกณฑ์นี้ - เพื่อเข้าใจว่าต้องเขียนเนื้อหาอะไร ไม่ใช่ข้อเท็จจริง\n"
         "2. อ่าน [EVIDENCE_SOURCES] - คือข้อเท็จจริงของหลักสูตรปีปัจจุบัน แหล่งเดียวที่อนุญาตให้ใช้เป็นข้อเท็จจริง "
         "จัดกลุ่มแยกเป็นบล็อกตามไฟล์ต้นทาง (SOURCE 1 ถึง SOURCE N) แต่ละ SOURCE คือหลักฐาน 1 ชิ้น (เช่น CV 1 คน)\n"
-        "3. เปรียบเทียบแต่ละข้อของ GUIDELINE กับ EVIDENCE_SOURCES ว่ามีหลักฐานรองรับหรือไม่\n"
-        "4. ถ้า Evidence ไม่รองรับข้อกำหนดข้อใด ห้ามแต่งข้อมูลขึ้นเพื่อให้ผ่าน Guideline - ให้ระบุ "
+        "3. ตรวจว่า EVIDENCE_SOURCES มีข้อเท็จจริงเพียงพอสำหรับแต่ละ Target Slot หรือไม่\n"
+        "4. ถ้า Evidence ไม่เพียงพอสำหรับ Target Slot ใด ห้ามแต่งข้อมูลขึ้นเอง - ให้ระบุ "
         "gap_analysis.status เป็น missing พร้อมระบุ missing_fields แทน\n"
-        "5. สร้างเนื้อหาเฉพาะจากข้อเท็จจริงใน Evidence ที่ตรวจสอบแล้วว่ารองรับ Guideline\n"
+        "5. สร้างเนื้อหาเฉพาะจากข้อเท็จจริงใน Evidence เท่านั้น\n"
         "6. จัดเนื้อหาลง Target Slots ที่กำหนดให้เท่านั้น (ห้ามสร้าง slot ใหม่)\n"
         "7. ทุกข้อความบรรยายที่มีข้อเท็จจริงต้องมี Citation Number เช่น [1] และทุก Row ของตารางต้องมี "
         "Citation ระดับ Row อ้างอิงกลับไปยัง Evidence Chunk จริงเท่านั้น (ห้ามอ้างอิง chunk ที่ไม่ได้อยู่ใน "
         "[EVIDENCE_SOURCES])\n"
         "8. ส่งกลับเป็น JSON ตาม schema ที่กำหนดเท่านั้น ห้ามส่งข้อความอื่นนอก JSON\n\n"
         "กฎเพิ่มเติม:\n"
-        "- ห้ามนำข้อมูลจาก [EXAMPLE_TEXT] มาใช้เป็นข้อเท็จจริงเด็ดขาด (ชื่อ/จำนวน/ตัวเลข/ปี/ผลการประเมิน) "
-        "ใช้ Example เพื่อศึกษาสำนวนภาษาและโครงสร้างประโยคเท่านั้น เว้นแต่ข้อมูลนั้นมี Evidence ปัจจุบันรองรับโดยตรง\n"
-        "- ใช้ [KEYWORDS] และ [REQUIRED_EVIDENCE] เป็นตัวช่วยทำความเข้าใจว่าเกณฑ์นี้ต้องการข้อมูลประเภทใด\n"
         "- citation_id ต้องเป็นเลขอ้างอิงที่คุณกำหนดเรียงลำดับเองภายในคำตอบนี้เท่านั้น รูปแบบ \"[1]\", \"[2]\", \"[3]\" "
         "(ตัวเลขเรียงจาก 1 ห้ามข้าม ห้ามซ้ำ) เริ่มนับใหม่ทุกครั้งที่ตอบ ห้ามใช้ค่าอื่นใดเป็น citation_id เด็ดขาด "
         "โดยเฉพาะห้ามคัดลอกชื่อไฟล์ เลข chunk_index หรือรหัสใดๆ ที่ปรากฏใน [EVIDENCE_SOURCES] มาใส่ใน citation_id - "
@@ -124,9 +121,8 @@ def _base_system_prompt(
     if get_settings().test_mode_force_content:
         prompt += (
             "\n\nหมายเหตุ (โหมดทดสอบระบบ - TEST_MODE_FORCE_CONTENT=true ใน .env): "
-            "[GUIDELINE] หรือ [REQUIRED_EVIDENCE] ของเกณฑ์นี้อาจว่างเปล่าเพราะยังไม่มีหลักฐานตัวเต็ม "
-            "(เช่น ยังไม่มี มคอ.2) ในกรณีนี้ห้ามตีความว่า 'ไม่มี Guideline ให้เช็ค = ข้อมูลไม่ครบ' และห้ามรายงาน "
-            "gap_analysis.status เป็น missing เพียงเพราะ GUIDELINE ว่าง - ให้เขียนเนื้อหาที่ตรงกับ Target Slot "
+            "หลักฐานของเกณฑ์นี้อาจยังไม่ครบตัวเต็ม (เช่น ยังไม่มี มคอ.2) ห้ามรายงาน "
+            "gap_analysis.status เป็น missing เพียงเพราะหลักฐานยังไม่ครบ - ให้เขียนเนื้อหาที่ตรงกับ Target Slot "
             "จาก Evidence Chunks ที่มีจริงให้ดีที่สุดแทน (ยังคงห้ามแต่งข้อเท็จจริงที่ไม่มีใน Evidence และยังต้องมี "
             "Citation ตามปกติ) วัตถุประสงค์คือทดสอบว่า pipeline ทำงานได้จริงระหว่างที่ยังรอ Evidence ตัวเต็ม"
         )
@@ -150,19 +146,9 @@ def _format_slots(slots: list[TargetSlot]) -> str:
     return "\n".join(lines)
 
 
-def _format_list(items: list[str]) -> str:
-    if not items:
-        return "(ไม่มีข้อมูล)"
-    return "\n".join(f"- {item}" for item in items)
-
-
 def build_prompt(
     criterion_code: str,
     criterion_name: str,
-    guideline: list[str],
-    keywords: list[str],
-    required_evidence: list[str],
-    example_section: str,
     evidence_chunks: list[EvidenceChunkContext],
     target_slots: list[TargetSlot],
     current_academic_year: int | None = None,
@@ -179,19 +165,6 @@ def build_prompt(
 
 [CRITERION_NAME]
 {criterion_name}
-
-[GUIDELINE]
-{_format_list(guideline)}
-
-[KEYWORDS]
-{_format_list(keywords)}
-
-[REQUIRED_EVIDENCE]
-{_format_list(required_evidence)}
-
-[EXAMPLE_TEXT]
-{example_section}
-(หมายเหตุ: Example ใช้เป็นแนวทางด้านภาษาเท่านั้น ห้ามนำข้อเท็จจริงจาก Example มาใช้)
 
 [EXAMPLE_JSON_STRUCTURE]
 {json.dumps(EXAMPLE_JSON_STRUCTURE, ensure_ascii=False, indent=2)}
@@ -214,10 +187,6 @@ def build_prompt(
 def run_agent(
     criterion_code: str,
     criterion_name: str,
-    guideline: list[str],
-    keywords: list[str],
-    required_evidence: list[str],
-    example_section: str,
     evidence_chunks: list[EvidenceChunkContext],
     target_slots: list[TargetSlot],
     current_academic_year: int | None = None,
@@ -227,10 +196,6 @@ def run_agent(
     system_prompt, user_prompt = build_prompt(
         criterion_code,
         criterion_name,
-        guideline,
-        keywords,
-        required_evidence,
-        example_section,
         evidence_chunks,
         target_slots,
         current_academic_year,
@@ -250,24 +215,15 @@ def run_agent(
         raise AgentOutputError(f"Agent JSON did not match the required schema: {exc}") from exc
 
 
-def default_build_data_request(criterion_code: str, meta: dict) -> DataRequest:
-    """Each Criterion Agent owns its Data Requirement (change.md sec.7) - it
-    is determined from the Agent's own Prompt/Logic/Template Structure, not
-    handed down by Master or the Retrieval Manager. Today an Agent's "Logic"
-    for what it needs is still keyword-based (master_config.json's
-    per-criterion `keywords`, unchanged from the pre-migration behavior) -
-    real per-data-type/role splitting (e.g. PS separately requesting
-    "person"/"education"/"appointment") needs the structured MongoDB
-    collections from change.md sec.9/sec.12 to be meaningful, which are out
-    of scope for this change (DO NOT TOUCH: real MongoDB data population).
-    Kept as one shared default (rather than six copy-pasted identical
-    bodies) since every agent currently builds its request the same way;
-    an agent module is free to override this once it has real data-type
-    logic of its own to express (see criterion_agents/ps_agent/agent.py's
-    docstring).
+def default_build_data_request(criterion_code: str) -> DataRequest:
+    """Placeholder Data Request for a Criterion Agent whose own Data
+    Requirement has not been implemented yet (P1/P2/P3/P4/P8 - criteria are
+    built one at a time, starting with PS).
+
+    SRS FR-010: each Criterion Agent must analyze its own Target Slots/fields
+    and decide what data it needs - not a keyword list from config. Until an
+    agent does that (see criterion_agents/ps_agent/agent.py's
+    build_data_request for the real pattern), it requests nothing, so it
+    gets no evidence and cannot inject content.
     """
-    query = " ".join(meta.get("keywords", []))
-    return DataRequest(
-        criterion=criterion_code,
-        requests=[DataRequestItem(data_type="evidence", purpose=query)],
-    )
+    return DataRequest(criterion=criterion_code, requests=[])

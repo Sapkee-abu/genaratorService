@@ -5,13 +5,12 @@ Handles ONLY the P2 criterion. Owns its own Prompt
 from every other Criterion Agent - see criterion_agents/_shared.py for the
 mechanics this module renders its own content into.
 
-prompt/system_prompt.txt is intentionally empty: master_config.json's
-criteria.P2.guideline is still [] (no real AUN-QA P2 guideline
-text has been supplied yet - master_config.json's own comment: "never
-fabricate AUN-QA guideline text without a source"). This agent runs with
-only the shared, criterion-agnostic instructions until that content is
-provided; supplying it is a content decision outside this codebase's
-authority (see the migration report's "DECISION REQUIRED" items for P2).
+prompt/system_prompt.txt is intentionally empty: no criterion-specific rules
+have been supplied yet, so this agent runs with only the shared,
+criterion-agnostic instructions. Not implemented yet (criteria are built
+one at a time, PS first): its own Data Requirement - derived from its
+Target Slots per SRS FR-010 - still has to be written in
+build_data_request(), which requests nothing until then.
 """
 
 from __future__ import annotations
@@ -27,16 +26,12 @@ CRITERION_CODE = "P2"
 _EXTRA_RULES = (Path(__file__).parent / "prompt" / "system_prompt.txt").read_text(encoding="utf-8")
 
 
-def build_data_request(meta: dict, target_slots: list[TargetSlot]) -> DataRequest:
-    return _shared.default_build_data_request(CRITERION_CODE, meta)
+def build_data_request(target_slots: list[TargetSlot]) -> DataRequest:
+    return _shared.default_build_data_request(CRITERION_CODE)
 
 
 def run(
     criterion_name: str,
-    guideline: list[str],
-    keywords: list[str],
-    required_evidence: list[str],
-    example_section: str,
     evidence_chunks: list[EvidenceChunkContext],
     target_slots: list[TargetSlot],
     current_academic_year: int | None = None,
@@ -45,10 +40,6 @@ def run(
     return _shared.run_agent(
         CRITERION_CODE,
         criterion_name,
-        guideline,
-        keywords,
-        required_evidence,
-        example_section,
         evidence_chunks,
         target_slots,
         current_academic_year,
